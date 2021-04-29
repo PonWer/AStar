@@ -8,7 +8,7 @@ namespace AStar
     public class World
     {
         internal WorldNode[,] Map;
-        internal int Width,Height;
+        internal int Width, Height;
         public World(int inHeight, int inWidth, string inMap)
         {
             inMap = inMap.Replace("[", string.Empty).Replace("]", string.Empty).Replace(",", string.Empty);
@@ -30,7 +30,7 @@ namespace AStar
             {
                 for (var x = 0; x < inWidth; x++)
                 {
-                    Map[y, x] = new WorldNode(x,y)
+                    Map[y, x] = new WorldNode(x, y)
                     {
                         IsWall = inMap.ElementAt(y * inWidth + x) == '1'
                     };
@@ -57,6 +57,25 @@ namespace AStar
             return returnList;
         }
 
+        public IEnumerable<WorldNode> GetNeighBoors(WorldNode inNode)
+        {
+            var returnList = new List<WorldNode>();
+
+            if (inNode.X - 1 > 0)
+                returnList.Add(Map[inNode.Y, inNode.X - 1]);
+
+            if (inNode.X + 1 < Width)
+                returnList.Add(Map[inNode.Y, inNode.X + 1]);
+
+            if (inNode.Y - 1 > 0)
+                returnList.Add(Map[inNode.Y - 1, inNode.X]);
+
+            if (inNode.Y + 1 < Height)
+                returnList.Add(Map[inNode.Y + 1, inNode.X]);
+
+            return returnList;
+        }
+
         public IEnumerable<WorldNode> GetUnvisitedDiagonalNeighBoors(WorldNode inNode)
         {
             var returnList = new List<WorldNode>();
@@ -71,6 +90,26 @@ namespace AStar
                 returnList.Add(Map[inNode.Y + 1, inNode.X - 1]);
 
             if (inNode.X + 1 < Width && inNode.Y - 1 < Width && !Map[inNode.Y - 1, inNode.X + 1].HasBeenVisited && !Map[inNode.Y - 1, inNode.X + 1].IsWall)
+                returnList.Add(Map[inNode.Y - 1, inNode.X + 1]);
+
+
+            return returnList;
+        }
+
+        public IEnumerable<WorldNode> GetDiagonalNeighbors(WorldNode inNode)
+        {
+            var returnList = new List<WorldNode>();
+
+            if (inNode.X - 1 > 0 && inNode.Y - 1 > 0)
+                returnList.Add(Map[inNode.Y - 1, inNode.X - 1]);
+
+            if (inNode.X + 1 < Width && inNode.Y + 1 < Width)
+                returnList.Add(Map[inNode.Y + 1, inNode.X + 1]);
+
+            if (inNode.X - 1 > 0 && inNode.Y + 1 > 0)
+                returnList.Add(Map[inNode.Y + 1, inNode.X - 1]);
+
+            if (inNode.X + 1 < Width && inNode.Y - 1 < Width)
                 returnList.Add(Map[inNode.Y - 1, inNode.X + 1]);
 
 

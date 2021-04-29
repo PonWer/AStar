@@ -17,8 +17,8 @@ namespace Launcher
             var pathfinder = new AStar.PathFinder(world, runSettings);
             var ok = pathfinder.SetStartAndTarget(3, 3, 48, 35);
 
-            //pathfinder.RunUntilEnd();
-            //pathfinder.PrintMapToConsole();
+            pathfinder.RunUntilEnd();
+            pathfinder.PrintMapToConsole();
 
             while (!pathfinder.RunSingleFrame())
             {

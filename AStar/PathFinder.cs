@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly:InternalsVisibleTo("AStar.Test")]
+[assembly: InternalsVisibleTo("AStar.Test")]
 
 namespace AStar
 {
@@ -14,7 +15,7 @@ namespace AStar
     {
 
         private readonly World _world;
-        private RunSettings _runSettings;
+        private readonly RunSettings _runSettings;
 
         private WorldNode _start, _target;
 
@@ -81,40 +82,43 @@ namespace AStar
             if (current == _target)
                 return true;
 
-            var neightboors = _world.GetUnvisitedNeighBoors(current);
-            foreach (var neightboor in neightboors)
-            {
-                if (current.G + _runSettings.MovementCost < neightboor.G)
-                {
-                    neightboor.G = current.G + _runSettings.MovementCost;
-                    neightboor.H = neightboor.GetDistance_Sqrt(_target);
-                    neightboor.Parent = current;
-
-                    if (!OpenList.Contains(neightboor))
-                        OpenList.Add(neightboor);
-                }
-            }
+            AddNeighborToOpenList(current);
 
             if (_runSettings.DiagonalMovement)
             {
-                var diagonalNeighBoors = _world.GetUnvisitedDiagonalNeighBoors(current);
-                foreach (var neightboor in diagonalNeighBoors)
-                {
-                    if (current.G + _runSettings.MovementCost < neightboor.G)
-                    {
-                        neightboor.G = current.G + _runSettings.DiagonalMovementCost;
-                        neightboor.H = neightboor.GetDistance_Sqrt(_target);
-                        neightboor.Parent = current;
-                        OpenList.Add(neightboor);
-
-
-                        if (!OpenList.Contains(neightboor))
-                            OpenList.Add(neightboor);
-                    }
-                }
+                AddNeighborToOpenList(current,true);
             }
 
             return false;
+        }
+
+        private void AddNeighborToOpenList(WorldNode current, bool inDiagonal = false)
+        {
+            var neighbors = inDiagonal ?
+                _world.GetDiagonalNeighbors(current) :
+                _world.GetNeighBoors(current);
+
+            foreach (var neighbor in neighbors.Where(x => !x.IsWall))
+            {
+                if (current.G + _runSettings.MovementCost < neighbor.G)
+                {
+                    UpdateWorldNodeWithNewParent(neighbor, current, inDiagonal);
+
+                    if (!OpenList.Contains(neighbor) && !ClosedList.Contains(neighbor))
+                        OpenList.Add(neighbor);
+                }
+            }
+        }
+
+
+        private void UpdateWorldNodeWithNewParent(WorldNode inNode, WorldNode inParent, bool inDiagonal = false)
+        {
+            inNode.G = inDiagonal
+                ? inParent.G + _runSettings.DiagonalMovementCost
+                : inParent.G + _runSettings.MovementCost;
+
+            inNode.H = inNode.GetDistance_Sqrt(_target);
+            inNode.Parent = inParent;
         }
 
         public void RunUntilEnd()
@@ -127,7 +131,6 @@ namespace AStar
 
         public void PrintMapToConsole()
         {
-
             var topAndBottom = new StringBuilder();
             for (var x = 0; x < _world.Width; x++)
             {
@@ -148,30 +151,7 @@ namespace AStar
                     else if (_world.Map[y, x].IsWall)
                         row.Append('X');
                     else if (_world.Map[y, x].HasBeenVisited)
-                    {
-                        var parent = _world.Map[y, x].Parent;
-
-                        var right = parent.X - x;
-                        var above = parent.X - x;
-
-
-                        if (right > 0 && above > 0)
-                            row.Append('↗');
-                        else if (right < 0 && above > 0)
-                            row.Append('↖');
-                        else if (right > 0&& above < 0)
-                            row.Append('↘');
-                        else if (right > 0 && above < 0)
-                            row.Append('↙');
-                        else if (right > 0)
-                            row.Append('→');
-                        else if (right < 0)
-                            row.Append('←');
-                        else if (above > 0)
-                            row.Append('↑');
-                        else
-                            row.Append('↓');
-                    }
+                        row.Append('*');
                     else if (_world.Map[y, x].G < double.MaxValue)
                         row.Append('?');
                     else

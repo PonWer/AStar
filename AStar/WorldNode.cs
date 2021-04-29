@@ -20,8 +20,7 @@ namespace AStar
             Y = inY;
             G = double.MaxValue;
         }
-
-
+        
         public double GetDistance_Sqrt(WorldNode inTargetNode)
         {
             return Math.Sqrt(Math.Pow((inTargetNode.X - X), 2) + Math.Pow((inTargetNode.Y - Y), 2));
