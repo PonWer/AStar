@@ -18,9 +18,8 @@ namespace AStar
         private readonly RunSettings _runSettings;
 
         private WorldNode _start, _target;
-
-        public List<WorldNode> OpenList = new List<WorldNode>();
-        public List<WorldNode> ClosedList = new List<WorldNode>();
+        private List<WorldNode> _openList = new List<WorldNode>();
+        public List<WorldNode> ResultingPath { get; private set; }
 
         public PathFinder(World inWorld, RunSettings inRunSettings)
         {
@@ -38,8 +37,6 @@ namespace AStar
         /// <returns>True if valid locations, false if locations are inside a wall or outside dimensions</returns>
         public bool SetStartAndTarget(int inStartX, int inStartY, int inTargetX, int inTargetY)
         {
-            CleanLists();
-
             //Verify X axis
             if (inStartX < 0 || inStartX >= _world.Width) return false;
             if (inTargetX < 0 || inTargetX >= _world.Width) return false;
@@ -54,7 +51,7 @@ namespace AStar
                 _start.G = 0;
                 _target = _world.Map[inTargetY, inTargetX];
 
-                OpenList.Add(_start);
+                _openList.Add(_start);
 
                 return true;
             }
@@ -62,78 +59,55 @@ namespace AStar
             return false;
         }
 
-        private void CleanLists()
-        {
-            OpenList.Clear();
-            ClosedList.Clear();
-        }
-
+        /// <summary>
+        ///  A single update, for debug purposes
+        /// </summary>
+        /// <returns></returns>
         public bool RunSingleFrame()
         {
-            if (!OpenList.Any())
+            if (!_openList.Any())
                 return true;
-            OpenList = OpenList.OrderBy(x => x.H).ToList();
+            _openList = _openList.OrderBy(x => x.F).ToList();
 
-            var current = OpenList.First();
-            OpenList.RemoveAt(0);
-            ClosedList.Add(current);
+            var current = _openList.First();
+            _openList.RemoveAt(0);
             current.HasBeenVisited = true;
 
             if (current == _target)
+            {
+                ResultingPath = TraverseBackToStart();
                 return true;
+            }
 
             AddNeighborToOpenList(current);
 
             if (_runSettings.DiagonalMovement)
-            {
                 AddNeighborToOpenList(current,true);
-            }
-
+            
             return false;
         }
 
-        private void AddNeighborToOpenList(WorldNode current, bool inDiagonal = false)
-        {
-            var neighbors = inDiagonal ?
-                _world.GetDiagonalNeighbors(current) :
-                _world.GetNeighBoors(current);
-
-            foreach (var neighbor in neighbors.Where(x => !x.IsWall))
-            {
-                if (current.G + _runSettings.MovementCost < neighbor.G)
-                {
-                    UpdateWorldNodeWithNewParent(neighbor, current, inDiagonal);
-
-                    if (!OpenList.Contains(neighbor) && !ClosedList.Contains(neighbor))
-                        OpenList.Add(neighbor);
-                }
-            }
-        }
-
-
-        private void UpdateWorldNodeWithNewParent(WorldNode inNode, WorldNode inParent, bool inDiagonal = false)
-        {
-            inNode.G = inDiagonal
-                ? inParent.G + _runSettings.DiagonalMovementCost
-                : inParent.G + _runSettings.MovementCost;
-
-            inNode.H = inNode.GetDistance_Sqrt(_target);
-            inNode.Parent = inParent;
-        }
-
+        /// <summary>
+        /// Loop until there are no more nodes to traverse or target reached
+        /// </summary>
         public void RunUntilEnd()
         {
             while (!RunSingleFrame())
             {
-
+                //do stuff?
             }
         }
 
-        public void PrintMapToConsole()
+        /// <summary>
+        /// Print map, got lazy and did it in console instead of a fancy drawing tool
+        /// </summary>
+        /// <param name="inOnlyPath"></param>
+        public void PrintMapToConsole(bool inOnlyPath)
         {
             var topAndBottom = new StringBuilder();
             for (var x = 0; x < _world.Width; x++)
             {
+                topAndBottom.Append('-');
                 topAndBottom.Append('-');
             }
             Console.WriteLine(topAndBottom);
@@ -144,20 +118,23 @@ namespace AStar
                 row.Append('|');
                 for (var x = 0; x < _world.Width; x++)
                 {
-                    if (x == _start.X && y == _start.Y)
+                    if (x == _start?.X && y == _start?.Y)
                         row.Append('S');
-                    else if (x == _target.X && y == _target.Y)
+                    else if (x == _target?.X && y == _target?.Y)
                         row.Append('T');
                     else if (_world.Map[y, x].IsWall)
                         row.Append('X');
-                    else if (_world.Map[y, x].HasBeenVisited)
-                        row.Append('*');
-                    else if (_world.Map[y, x].G < double.MaxValue)
+                    else if (inOnlyPath && ResultingPath.Contains(_world.Map[y, x]))
+                        row.Append('P');
+                    else if (!inOnlyPath && _world.Map[y, x].HasBeenVisited)
+                        row.Append('.');
+                    else if (!inOnlyPath && _world.Map[y, x].G < double.MaxValue)
                         row.Append('?');
                     else
                     {
                         row.Append(' ');
                     }
+                    row.Append(' ');
                 }
                 row.Append('|');
                 Console.WriteLine(row);
@@ -165,5 +142,67 @@ namespace AStar
 
             Console.WriteLine(topAndBottom);
         }
+
+        #region Private Methods
+
+        private void AddNeighborToOpenList(WorldNode inCurrent, bool inDiagonal = false)
+        {
+            var neighbors = inDiagonal ?
+                _world.GetNonWallDiagonalNeighBoors(inCurrent) :
+                _world.GetNonWallNeighBoors(inCurrent);
+
+            foreach (var neighbor in neighbors)
+            {
+                var tempG = inCurrent.G = inDiagonal
+                    ? inCurrent.G + _runSettings.DiagonalMovementCost
+                    : inCurrent.G + _runSettings.MovementCost;
+
+                //Only work on if the G score is better than before
+                if (neighbor.G < tempG)
+                    continue;
+
+                switch (_runSettings.AlgorithmToDetermineDistance)
+                {
+                    case RunSettings.DistanceAlgorithm.Euclidean:
+                        neighbor.H = neighbor.GetDistance_Euclidean(_target);
+                        break;
+                    case RunSettings.DistanceAlgorithm.Manhattan:
+                        neighbor.H = neighbor.GetDistance_Manhattan(_target);
+                        break;
+                    case RunSettings.DistanceAlgorithm.Chessboard:
+                        neighbor.H = neighbor.GetDistance_Chessboard(_target);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(_runSettings.AlgorithmToDetermineDistance));
+                }
+
+                //Update scores
+                neighbor.G = tempG;
+                neighbor.F = neighbor.H * _runSettings.PullWeightToTarget + neighbor.G;
+
+                //Set the (new) parent
+                neighbor.Parent = inCurrent;
+
+                //Add to open list only if not already present and not closed
+                if (!_openList.Contains(neighbor) && !neighbor.HasBeenVisited)
+                    _openList.Add(neighbor);
+            }
+        }
+
+        private List<WorldNode> TraverseBackToStart()
+        {
+            var current = _target;
+            var returnList = new List<WorldNode>();
+
+            while (current != _start)
+            {
+                returnList.Add(current);
+                current = current.Parent;
+            }
+            returnList.Add(current);
+
+            return returnList;
+        }
+        #endregion
     }
 }

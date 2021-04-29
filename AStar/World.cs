@@ -5,10 +5,19 @@ using System.Text;
 
 namespace AStar
 {
+    /// <summary>
+    /// To create and contain the world setting
+    /// </summary>
     public class World
     {
         internal WorldNode[,] Map;
         internal int Width, Height;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="inHeight"></param>
+        /// <param name="inWidth"></param>
+        /// <param name="inMap"></param>
         public World(int inHeight, int inWidth, string inMap)
         {
             inMap = inMap.Replace("[", string.Empty).Replace("]", string.Empty).Replace(",", string.Empty);
@@ -38,25 +47,35 @@ namespace AStar
             }
         }
 
-        public IEnumerable<WorldNode> GetUnvisitedNeighBoors(WorldNode inNode)
+        /// <summary>
+        /// Get all non wall nodes neighboring provided node
+        /// </summary>
+        /// <param name="inNode"></param>
+        /// <returns></returns>
+        public IEnumerable<WorldNode> GetNonWallNeighBoors(WorldNode inNode)
         {
             var returnList = new List<WorldNode>();
 
-            if (inNode.X - 1 > 0 && !Map[inNode.Y, inNode.X - 1].HasBeenVisited && !Map[inNode.Y, inNode.X - 1].IsWall)
+            if (inNode.X - 1 > 0 && !Map[inNode.Y, inNode.X - 1].IsWall)
                 returnList.Add(Map[inNode.Y, inNode.X - 1]);
 
-            if (inNode.X + 1 < Width && !Map[inNode.Y, inNode.X + 1].HasBeenVisited && !Map[inNode.Y, inNode.X + 1].IsWall)
+            if (inNode.X + 1 < Width && !Map[inNode.Y, inNode.X + 1].IsWall)
                 returnList.Add(Map[inNode.Y, inNode.X + 1]);
 
-            if (inNode.Y - 1 > 0 && !Map[inNode.Y - 1, inNode.X].HasBeenVisited && !Map[inNode.Y - 1, inNode.X].IsWall)
+            if (inNode.Y - 1 > 0 && !Map[inNode.Y - 1, inNode.X].IsWall)
                 returnList.Add(Map[inNode.Y - 1, inNode.X]);
 
-            if (inNode.Y + 1 < Height && !Map[inNode.Y + 1, inNode.X].HasBeenVisited && !Map[inNode.Y + 1, inNode.X].IsWall)
+            if (inNode.Y + 1 < Height && !Map[inNode.Y + 1, inNode.X].IsWall)
                 returnList.Add(Map[inNode.Y + 1, inNode.X]);
 
             return returnList;
         }
 
+        /// <summary>
+        /// Get all nodes neighboring provided node
+        /// </summary>
+        /// <param name="inNode"></param>
+        /// <returns></returns>
         public IEnumerable<WorldNode> GetNeighBoors(WorldNode inNode)
         {
             var returnList = new List<WorldNode>();
@@ -76,26 +95,37 @@ namespace AStar
             return returnList;
         }
 
-        public IEnumerable<WorldNode> GetUnvisitedDiagonalNeighBoors(WorldNode inNode)
+
+        /// <summary>
+        /// Get all diagonal non wall nodes neighboring provided node
+        /// </summary>
+        /// <param name="inNode"></param>
+        /// <returns></returns>
+        public IEnumerable<WorldNode> GetNonWallDiagonalNeighBoors(WorldNode inNode)
         {
             var returnList = new List<WorldNode>();
 
-            if (inNode.X - 1 > 0 && inNode.Y - 1 > 0 && !Map[inNode.Y - 1, inNode.X - 1].HasBeenVisited && !Map[inNode.Y - 1, inNode.X - 1].IsWall)
+            if (inNode.X - 1 > 0 && !Map[inNode.Y - 1, inNode.X - 1].IsWall)
                 returnList.Add(Map[inNode.Y - 1, inNode.X - 1]);
 
-            if (inNode.X + 1 < Width && inNode.Y + 1 < Width && !Map[inNode.Y + 1, inNode.X + 1].HasBeenVisited && !Map[inNode.Y + 1, inNode.X + 1].IsWall)
+            if (inNode.X + 1 < Width && !Map[inNode.Y + 1, inNode.X + 1].IsWall)
                 returnList.Add(Map[inNode.Y + 1, inNode.X + 1]);
 
-            if (inNode.X - 1 > 0 && inNode.Y + 1 > 0 && !Map[inNode.Y + 1, inNode.X - 1].HasBeenVisited && !Map[inNode.Y + 1, inNode.X - 1].IsWall)
+            if (inNode.X - 1 > 0 && !Map[inNode.Y + 1, inNode.X - 1].IsWall)
                 returnList.Add(Map[inNode.Y + 1, inNode.X - 1]);
 
-            if (inNode.X + 1 < Width && inNode.Y - 1 < Width && !Map[inNode.Y - 1, inNode.X + 1].HasBeenVisited && !Map[inNode.Y - 1, inNode.X + 1].IsWall)
+            if (inNode.X + 1 < Width && !Map[inNode.Y - 1, inNode.X + 1].IsWall)
                 returnList.Add(Map[inNode.Y - 1, inNode.X + 1]);
 
 
             return returnList;
         }
 
+        /// <summary>
+        /// Get all diagonal nodes neighboring provided node
+        /// </summary>
+        /// <param name="inNode"></param>
+        /// <returns></returns>
         public IEnumerable<WorldNode> GetDiagonalNeighbors(WorldNode inNode)
         {
             var returnList = new List<WorldNode>();

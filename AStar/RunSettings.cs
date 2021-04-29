@@ -9,7 +9,29 @@ namespace AStar
     public class RunSettings
     {
         public bool DiagonalMovement = false;
-        public double DiagonalMovementCost = 1.5f;
-        public double MovementCost = 1.0f;
+
+        //Cost
+        public double DiagonalMovementCost = 1.0f;
+        public double MovementCost = 0.5f;
+
+        //
+        public double PullWeightToTarget = 2.0f;
+
+        //Which algorithm to use
+        public DistanceAlgorithm AlgorithmToDetermineDistance;
+
+        public enum DistanceAlgorithm
+        {
+            //Normal sqrt(pow(A.x - B.x) + pow(A.y - B.Y))
+            Euclidean,
+
+            //nodeDistance
+            Manhattan,
+
+            // MAX(dX,dY)
+            Chessboard
+        }
+
+
     }
 }

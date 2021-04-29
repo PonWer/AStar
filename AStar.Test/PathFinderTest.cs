@@ -18,7 +18,6 @@ namespace AStar.Test
         public void Init()
         {
             _world = new World(25, 25, SampleMaps.Map25x25);
-            _world.PrintMapToConsole();
 
             _runSettings = new RunSettings();
 
