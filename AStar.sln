@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AStar", "AStar\AStar.csproj", "{B80F060C-2AEA-4E90-946B-327C05028939}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AStar.Test", "AStar.Test\AStar.Test.csproj", "{4A3CC0E1-EB81-4669-8E68-33D31C0BB9C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "Launcher\Launcher.csproj", "{D75B6C59-50A9-4CD0-A85C-8FB23743274F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B80F060C-2AEA-4E90-946B-327C05028939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B80F060C-2AEA-4E90-946B-327C05028939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B80F060C-2AEA-4E90-946B-327C05028939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B80F060C-2AEA-4E90-946B-327C05028939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A3CC0E1-EB81-4669-8E68-33D31C0BB9C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A3CC0E1-EB81-4669-8E68-33D31C0BB9C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A3CC0E1-EB81-4669-8E68-33D31C0BB9C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A3CC0E1-EB81-4669-8E68-33D31C0BB9C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D75B6C59-50A9-4CD0-A85C-8FB23743274F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D75B6C59-50A9-4CD0-A85C-8FB23743274F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D75B6C59-50A9-4CD0-A85C-8FB23743274F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D75B6C59-50A9-4CD0-A85C-8FB23743274F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {58D66EF1-090B-4C83-B3E2-5752B6ABC69E}
+	EndGlobalSection
+EndGlobal
