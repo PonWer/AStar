@@ -4,13 +4,13 @@ using AStar;
 
 namespace Launcher
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var world = new World(50, 50, SampleMaps.Map50x50);
 
-            var runSettings = new RunSettings()
+            var runSettings = new RunSettings
             {
                 DiagonalMovement = true,
                 AlgorithmToDetermineDistance = RunSettings.DistanceAlgorithm.Euclidean,

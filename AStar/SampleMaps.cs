@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AStar
+﻿namespace AStar
 {
     /// <summary>
     ///  Container for maps generated at http://whostolemyhat.github.io/level-generator/
