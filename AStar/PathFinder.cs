@@ -90,8 +90,8 @@ namespace AStar
 
             AddNeighborToOpenList(current);
             if (_runSettings.DiagonalMovement)
-                AddNeighborToOpenList(current,true);
-            
+                AddNeighborToOpenList(current, true);
+
             return RunStatus.InProgress;
         }
 
@@ -133,9 +133,11 @@ namespace AStar
                     {
                         outputBuilder.Append(' ');
                     }
+
                     //2 chars for each node
                     outputBuilder.Append(' ');
                 }
+
                 //New row
                 outputBuilder.Append('\n');
             }
@@ -147,9 +149,9 @@ namespace AStar
 
         private void AddNeighborToOpenList(WorldNode inCurrent, bool inDiagonal = false)
         {
-            var neighbors = inDiagonal ?
-                _world.GetNonWallDiagonalNeighBoors(inCurrent) :
-                _world.GetNonWallNeighBoors(inCurrent);
+            var neighbors = inDiagonal
+                ? _world.GetNonWallDiagonalNeighBoors(inCurrent)
+                : _world.GetNonWallNeighBoors(inCurrent);
 
             foreach (var neighbor in neighbors)
             {
@@ -196,7 +198,7 @@ namespace AStar
                 //Move to its parent
                 current = current.Parent;
             }
-            
+
             //Add start
             returnList.Add(current);
 
@@ -205,6 +207,7 @@ namespace AStar
 
             return returnList;
         }
+
         #endregion
     }
 }

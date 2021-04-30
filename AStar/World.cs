@@ -31,9 +31,11 @@ namespace AStar
             {
                 throw new InvalidOperationException("Map string length does NOT match provided height and width");
             }
+
             if (!inMap.All(x => x == '0' || x == '1'))
             {
-                throw new InvalidOperationException("Map string contains invalid characters, can only contain 0 or 1, however '[', ']', ',' are allowed but will be filtered out");
+                throw new InvalidOperationException(
+                    "Map string contains invalid characters, can only contain 0 or 1, however '[', ']', ',' are allowed but will be filtered out");
             }
 
             for (var y = 0; y < inHeight; y++)
@@ -75,7 +77,7 @@ namespace AStar
 
             return returnList;
         }
-        
+
         /// <summary>
         /// Get all diagonal non wall nodes neighboring provided node
         /// </summary>
@@ -86,7 +88,7 @@ namespace AStar
             var returnList = new List<WorldNode>();
 
             //Bottom Left
-            if (inNode.Y - 1 >= 0 && inNode.X - 1 >= 0 && 
+            if (inNode.Y - 1 >= 0 && inNode.X - 1 >= 0 &&
                 !Map[inNode.Y - 1, inNode.X - 1].IsWall)
                 returnList.Add(Map[inNode.Y - 1, inNode.X - 1]);
 
@@ -96,15 +98,15 @@ namespace AStar
                 returnList.Add(Map[inNode.Y - 1, inNode.X + 1]);
 
             //Top Right
-            if (inNode.Y + 1 < Height && inNode.X + 1 < Width && 
+            if (inNode.Y + 1 < Height && inNode.X + 1 < Width &&
                 !Map[inNode.Y + 1, inNode.X + 1].IsWall)
                 returnList.Add(Map[inNode.Y + 1, inNode.X + 1]);
 
             //Top Left
-            if (inNode.Y + 1 < Height && inNode.X - 1 >= 0 && 
+            if (inNode.Y + 1 < Height && inNode.X - 1 >= 0 &&
                 !Map[inNode.Y + 1, inNode.X - 1].IsWall)
                 returnList.Add(Map[inNode.Y + 1, inNode.X - 1]);
-            
+
 
             return returnList;
         }

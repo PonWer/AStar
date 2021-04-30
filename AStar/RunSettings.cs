@@ -14,7 +14,8 @@ namespace AStar
         public bool DiagonalMovement = false;
 
         ///Cost
-        public double DiagonalMovementCost = Math.Sqrt(1+1);
+        public double DiagonalMovementCost = Math.Sqrt(1 + 1);
+
         public double MovementCost = 1.0f;
 
         ///Increase for faster search but less accurate
@@ -34,7 +35,5 @@ namespace AStar
             // MAX(dX,dY)
             Chessboard
         }
-
-
     }
 }

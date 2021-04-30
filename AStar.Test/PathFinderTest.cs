@@ -42,6 +42,5 @@ namespace AStar.Test
         {
             Assert.IsTrue(_pathfinder.SetStartAndTarget(3, 3, 4, 4));
         }
-
     }
 }

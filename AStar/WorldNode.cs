@@ -38,7 +38,7 @@ namespace AStar
 
         public double GetDistance_Chessboard(WorldNode inTargetNode)
         {
-            return Math.Max(Math.Abs(inTargetNode.X - X),Math.Abs(inTargetNode.Y - Y));
+            return Math.Max(Math.Abs(inTargetNode.X - X), Math.Abs(inTargetNode.Y - Y));
         }
     }
 }

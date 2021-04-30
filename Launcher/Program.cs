@@ -48,7 +48,7 @@ namespace Launcher
             var debug = Console.ReadLine()?.ToUpper() == "Y";
             if (debug)
             {
-                Console.WriteLine("Do you want the iteration to be [A]utomatic (flashing when updating screen) or [M]anuel?");
+                Console.WriteLine("Do you want the iteration to be [A]utomatic or [M]anuel?");
                 var automatic = Console.ReadLine()?.ToUpper() == "A";
                 if (automatic)
                 {
