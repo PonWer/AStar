@@ -11,15 +11,24 @@ using System.Threading.Tasks;
 
 namespace AStar
 {
+    /// <summary>
+    /// Find the path from start to end using World object
+    /// </summary>
     public class PathFinder
     {
-
         private readonly World _world;
         private readonly RunSettings _runSettings;
 
         private WorldNode _start, _target;
         private List<WorldNode> _openList = new List<WorldNode>();
         public List<WorldNode> ResultingPath { get; private set; }
+
+        public enum RunStatus
+        {
+            FailedToFindPath = -1,
+            InProgress,
+            Done
+        }
 
         public PathFinder(World inWorld, RunSettings inRunSettings)
         {
@@ -63,10 +72,10 @@ namespace AStar
         ///  A single update, for debug purposes
         /// </summary>
         /// <returns></returns>
-        public bool RunSingleFrame()
+        public RunStatus RunSingleFrame()
         {
             if (!_openList.Any())
-                return true;
+                return RunStatus.FailedToFindPath;
             _openList = _openList.OrderBy(x => x.F).ToList();
 
             var current = _openList.First();
@@ -76,15 +85,14 @@ namespace AStar
             if (current == _target)
             {
                 ResultingPath = TraverseBackToStart();
-                return true;
+                return RunStatus.Done;
             }
 
             AddNeighborToOpenList(current);
-
             if (_runSettings.DiagonalMovement)
                 AddNeighborToOpenList(current,true);
             
-            return false;
+            return RunStatus.InProgress;
         }
 
         /// <summary>
@@ -92,7 +100,7 @@ namespace AStar
         /// </summary>
         public void RunUntilEnd()
         {
-            while (!RunSingleFrame())
+            while (RunSingleFrame() == RunStatus.InProgress)
             {
                 //do stuff?
             }
@@ -104,43 +112,35 @@ namespace AStar
         /// <param name="inOnlyPath"></param>
         public void PrintMapToConsole(bool inOnlyPath)
         {
-            var topAndBottom = new StringBuilder();
-            for (var x = 0; x < _world.Width; x++)
-            {
-                topAndBottom.Append('-');
-                topAndBottom.Append('-');
-            }
-            Console.WriteLine(topAndBottom);
-
+            var outputBuilder = new StringBuilder();
             for (var y = _world.Height - 1; y >= 0; y--)
             {
-                var row = new StringBuilder();
-                row.Append('|');
                 for (var x = 0; x < _world.Width; x++)
                 {
                     if (x == _start?.X && y == _start?.Y)
-                        row.Append('S');
+                        outputBuilder.Append('S');
                     else if (x == _target?.X && y == _target?.Y)
-                        row.Append('T');
+                        outputBuilder.Append('T');
                     else if (_world.Map[y, x].IsWall)
-                        row.Append('X');
+                        outputBuilder.Append('X');
                     else if (inOnlyPath && ResultingPath.Contains(_world.Map[y, x]))
-                        row.Append('P');
+                        outputBuilder.Append('P');
                     else if (!inOnlyPath && _world.Map[y, x].HasBeenVisited)
-                        row.Append('.');
+                        outputBuilder.Append('.');
                     else if (!inOnlyPath && _world.Map[y, x].G < double.MaxValue)
-                        row.Append('?');
+                        outputBuilder.Append('?');
                     else
                     {
-                        row.Append(' ');
+                        outputBuilder.Append(' ');
                     }
-                    row.Append(' ');
+                    //2 chars for each node
+                    outputBuilder.Append(' ');
                 }
-                row.Append('|');
-                Console.WriteLine(row);
+                //New row
+                outputBuilder.Append('\n');
             }
 
-            Console.WriteLine(topAndBottom);
+            Console.WriteLine(outputBuilder);
         }
 
         #region Private Methods
@@ -153,28 +153,23 @@ namespace AStar
 
             foreach (var neighbor in neighbors)
             {
-                var tempG = inCurrent.G = inDiagonal
-                    ? inCurrent.G + _runSettings.DiagonalMovementCost
-                    : inCurrent.G + _runSettings.MovementCost;
+                var tempG = inCurrent.G + (inDiagonal
+                    ? _runSettings.DiagonalMovementCost
+                    : _runSettings.MovementCost);
 
                 //Only work on if the G score is better than before
                 if (neighbor.G < tempG)
                     continue;
 
-                switch (_runSettings.AlgorithmToDetermineDistance)
+
+                //Get the distance based on runsettings
+                neighbor.H = _runSettings.AlgorithmToDetermineDistance switch
                 {
-                    case RunSettings.DistanceAlgorithm.Euclidean:
-                        neighbor.H = neighbor.GetDistance_Euclidean(_target);
-                        break;
-                    case RunSettings.DistanceAlgorithm.Manhattan:
-                        neighbor.H = neighbor.GetDistance_Manhattan(_target);
-                        break;
-                    case RunSettings.DistanceAlgorithm.Chessboard:
-                        neighbor.H = neighbor.GetDistance_Chessboard(_target);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(_runSettings.AlgorithmToDetermineDistance));
-                }
+                    RunSettings.DistanceAlgorithm.Euclidean => neighbor.GetDistance_Euclidean(_target),
+                    RunSettings.DistanceAlgorithm.Manhattan => neighbor.GetDistance_Manhattan(_target),
+                    RunSettings.DistanceAlgorithm.Chessboard => neighbor.GetDistance_Chessboard(_target),
+                    _ => throw new ArgumentOutOfRangeException(nameof(_runSettings.AlgorithmToDetermineDistance))
+                };
 
                 //Update scores
                 neighbor.G = tempG;
@@ -191,15 +186,22 @@ namespace AStar
 
         private List<WorldNode> TraverseBackToStart()
         {
-            var current = _target;
             var returnList = new List<WorldNode>();
 
+            //Start end end
+            var current = _target;
             while (current != _start)
             {
                 returnList.Add(current);
+                //Move to its parent
                 current = current.Parent;
             }
+            
+            //Add start
             returnList.Add(current);
+
+            //Reverse so start is first
+            returnList.Reverse();
 
             return returnList;
         }

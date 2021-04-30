@@ -12,8 +12,9 @@ namespace Launcher
 
             var runSettings = new RunSettings()
             {
-                DiagonalMovement = false,
-                AlgorithmToDetermineDistance = RunSettings.DistanceAlgorithm.Euclidean
+                DiagonalMovement = true,
+                AlgorithmToDetermineDistance = RunSettings.DistanceAlgorithm.Euclidean,
+                PullWeightToTarget = 1.0f
             };
             var pathfinder = new PathFinder(world, runSettings);
 
@@ -45,33 +46,36 @@ namespace Launcher
 
             Console.WriteLine("Debug mode to view the process? [Y]/[N])");
             var debug = Console.ReadLine()?.ToUpper() == "Y";
-
             if (debug)
             {
                 Console.WriteLine("Do you want the iteration to be [A]utomatic (flashing when updating screen) or [M]anuel?");
                 var automatic = Console.ReadLine()?.ToUpper() == "A";
-
                 if (automatic)
                 {
-                    while (!pathfinder.RunSingleFrame())
+                    Console.Clear();
+                    while (pathfinder.RunSingleFrame() == PathFinder.RunStatus.InProgress)
                     {
-                        Console.Clear();
+                        Console.SetCursorPosition(0, 0);
                         pathfinder.PrintMapToConsole(false);
                         Thread.Sleep(10);
                     }
+
+                    var result = pathfinder.ResultingPath;
                 }
                 else
                 {
                     Console.WriteLine("Press any key to step once, until done");
                     Console.ReadKey();
-                    while (!pathfinder.RunSingleFrame())
+                    Console.Clear();
+                    while (pathfinder.RunSingleFrame() == PathFinder.RunStatus.InProgress)
                     {
-                        Console.Clear();
+                        Console.SetCursorPosition(0, 0);
                         pathfinder.PrintMapToConsole(false);
                         _ = Console.ReadKey();
                     }
-                }
 
+                    var result = pathfinder.ResultingPath;
+                }
             }
             else
             {

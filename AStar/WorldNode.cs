@@ -28,7 +28,7 @@ namespace AStar
 
         public double GetDistance_Euclidean(WorldNode inTargetNode)
         {
-            return Math.Sqrt(Math.Pow((inTargetNode.X - X), 2) + Math.Pow((inTargetNode.Y - Y), 2));
+            return Math.Sqrt(Math.Pow(inTargetNode.X - X, 2) + Math.Pow(inTargetNode.Y - Y, 2));
         }
 
         public double GetDistance_Manhattan(WorldNode inTargetNode)
